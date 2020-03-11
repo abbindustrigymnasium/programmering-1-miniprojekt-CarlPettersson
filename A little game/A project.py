@@ -21,19 +21,37 @@ class player(object):
         self.left = False
         self.right = False
         self.walk_count = 0
+        self.standing = True
 
     def draw(self, display):                #drawing everything causes everything to be seen
         if self.walk_count +1 >= 27:
             self.walk_count = 0
 
-        if self.left:
-            display.blit(char_walkLeft[self.walk_count//3], (self.x, self.y))               #one picture per 3 frames
-            self.walk_count += 1
-        elif self.right:
-            display.blit(char_walkRight[self.walk_count//3], (self.x, self.y))              #animating the character
-            self.walk_count += 1
+        if not (self.standing):
+            if self.left:
+                display.blit(char_walkLeft[self.walk_count//3], (self.x, self.y))               #one picture per 3 frames
+                self.walk_count += 1
+            elif self.right:
+                display.blit(char_walkRight[self.walk_count//3], (self.x, self.y))              #animating the character
+                self.walk_count += 1
         else:
-            display.blit(char, (self.x, self.y))
+            if self.right:
+                display.blit(char_walkRight[0], (self.x, self.y))
+            else:
+                display.blit(char_walkLeft[0], (self.x, self.y))
+
+class projectile(object):
+    def __init__(self, x, y, radius, colour, direction):
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.colour = colour
+        self. direction = direction
+        self.velocity = 10 * direction
+
+    def draw(self, display):
+        pygame.draw.circle(display, self.colour, (self.x, self.y), self.radius)
+
 
 black = (0, 0, 0)                   #defining Colours
 white = (255, 255, 255)
@@ -50,11 +68,14 @@ pygame.display.set_icon(programIcon)
 
 def UpdateDisplay():
     display.blit(background, (0, 0))     #creates a background
-    character.draw(display)
+    character.draw(display)             #draw character
+    for bullet in bullets:
+        bullet.draw(display)
     pygame.display.update()                         #updating the display
 
 #mainloop
 character = player(300, 350, 64, 64)
+bullets = []
 run = True
 
 while run:
@@ -65,8 +86,21 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
+    for bullet in bullets:
+        if bullet.x < 900 and bullet.x > 0:
+            bullet.x += bullet.velocity
+        else:
+            bullets.pop(bullets.index(bullet))
+
     keys = pygame.key.get_pressed()
-    
+
+    if keys[pygame.K_w] or keys[pygame.K_UP]:
+        if character.left:
+            direction = -1
+        else:
+            direction = 1
+        if len(bullets) < 1000:
+            bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
     if keys[pygame.K_LSHIFT] and keys[pygame.K_a] or keys[pygame.K_LSHIFT] and keys[pygame.K_d] or keys[pygame.K_LSHIFT] and keys[pygame.K_RIGHT] or keys[pygame.K_LSHIFT] and keys[pygame.K_LEFT]:        #sprint
         character.speed = 10
     else:
@@ -75,13 +109,14 @@ while run:
         character.x -= character.speed
         character.left = True
         character.right = False                                            #creating borders within you can move
+        character.standing = False
     elif keys[pygame.K_d] and character.x < display_width-character.width or keys[pygame.K_RIGHT] and character.x < display_width-character.width:
         character.x += character.speed
         character.right = True
         character.left = False
+        character.standing = False
     else:
-        character.right = False
-        character.left = False
+        character.standing = True
         character.walk_count = 0
     if not (character.jump):
         if keys[pygame.K_SPACE]:
