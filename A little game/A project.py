@@ -52,6 +52,45 @@ class projectile(object):
     def draw(self, display):
         pygame.draw.circle(display, self.colour, (self.x, self.y), self.radius)         #drawing the projectile
 
+class enemy(object):
+    walk_right = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'), pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'), pygame.image.load('R7E.png'), pygame.image.load('R8E.png'), pygame.image.load('R9E.png'), pygame.image.load('R10E.png'), pygame.image.load('R11E.png')]
+    walk_left = [pygame.image.load('L1E.png'), pygame.image.load('L2E.png'), pygame.image.load('L3E.png'), pygame.image.load('L4E.png'), pygame.image.load('L5E.png'), pygame.image.load('L6E.png'), pygame.image.load('L7E.png'), pygame.image.load('L8E.png'), pygame.image.load('L9E.png'), pygame.image.load('L10E.png'), pygame.image.load('L11E.png')]
+
+    def __init__ (self, x, y, width, height, end):
+        self.x = x
+        self.y = y
+        self.width  = width
+        self.height = height
+        self.end = end
+        self.path = [self.x, self.end]
+        self.walk_count = 0
+        self.velocity = 3
+
+    def draw(self, display):
+        self.move()
+        if self.walk_count +1 >= 33:
+            self.walk_count = 0
+
+        if self.velocity > 0:
+            display.blit(self.walk_right[self.walk_count // 3], (self.x, self.y))
+            self.walk_count += 1
+        else:
+            display.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
+            self.walk_count += 1
+
+    def move(self):
+        if self.velocity > 0:
+            if self.x  + self.velocity < self.path[1]:
+                self.x += self.velocity
+            else:
+                self.velocity = self.velocity * -1  
+                self.walk_count = 0
+        else:
+            if self.x - self.velocity > self.path[0]:
+                self.x += self.velocity
+            else:
+                self.velocity = self.velocity * -1
+                self.walk_count = 0
 
 black = (0, 0, 0)                   #defining Colours
 white = (255, 255, 255)
@@ -69,12 +108,14 @@ pygame.display.set_icon(programIcon)
 def UpdateDisplay():
     display.blit(background, (0, 0))     #creates a background
     character.draw(display)             #draw character
+    Enemy.draw(display)
     for bullet in bullets:
         bullet.draw(display)
     pygame.display.update()                         #updating the display
 
 #mainloop
-character = player(300, 350, 64, 64)            #character size and starter position
+character = player(300, 310, 64, 64)            #character size and starter position
+Enemy = enemy(0, 350, 64, 64, 836)
 bullets = []            
 run = True
 
@@ -101,7 +142,7 @@ while run:
             direction = 1
         if len(bullets) < 10:           #number of projectiles/bullets there can be on the screen at the same time
             bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
-    if keys[pygame.K_LSHIFT] and keys[pygame.K_a] or keys[pygame.K_LSHIFT] and keys[pygame.K_d] or keys[pygame.K_LSHIFT] and keys[pygame.K_RIGHT] or keys[pygame.K_LSHIFT] and keys[pygame.K_LEFT]:        #sprint
+    if keys[pygame.K_LSHIFT]:        #sprint
         character.speed = 10
     else:
         character.speed = 5
