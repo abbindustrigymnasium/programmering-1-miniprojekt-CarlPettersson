@@ -99,7 +99,7 @@ while run:
             direction = -1
         else:
             direction = 1
-        if len(bullets) < 1000:
+        if len(bullets) < 10:
             bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
     if keys[pygame.K_LSHIFT] and keys[pygame.K_a] or keys[pygame.K_LSHIFT] and keys[pygame.K_d] or keys[pygame.K_LSHIFT] and keys[pygame.K_RIGHT] or keys[pygame.K_LSHIFT] and keys[pygame.K_LEFT]:        #sprint
         character.speed = 10
