@@ -9,6 +9,8 @@ char_walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygam
 background = pygame.image.load('Mountains_background.png')       #background image
 char = pygame.image.load('standing.png')
 
+score = 0
+
 class player(object):
     def __init__(self, x, y, width, height):            #character attributes
         self.x = x
@@ -22,6 +24,7 @@ class player(object):
         self.right = False
         self.walk_count = 0
         self.standing = True
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
 
     def draw(self, display):                #drawing everything causes everything to be seen
         if self.walk_count +1 >= 27:
@@ -39,6 +42,8 @@ class player(object):
                 display.blit(char_walkRight[0], (self.x, self.y))
             else:
                 display.blit(char_walkLeft[0], (self.x, self.y))
+        self.hitbox = (self.x + 17, self.y + 11, 29, 52)
+        # pygame.draw.rect(display, blue, self.hitbox, 2)
 
 class projectile(object):
     def __init__(self, x, y, radius, colour, direction):            #the projectiles different attributes
@@ -65,18 +70,27 @@ class enemy(object):
         self.path = [self.x, self.end]
         self.walk_count = 0
         self.velocity = 3
+        self.hitbox = self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+        self.health = 9
+        self.visible = True
 
     def draw(self, display):
         self.move()
-        if self.walk_count +1 >= 33:
-            self.walk_count = 0
+        if self.visible:
+            if self.walk_count +1 >= 33:
+               self.walk_count = 0
 
-        if self.velocity > 0:
-            display.blit(self.walk_right[self.walk_count // 3], (self.x, self.y))
-            self.walk_count += 1
-        else:
-            display.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
-            self.walk_count += 1
+            if self.velocity > 0:
+                display.blit(self.walk_right[self.walk_count // 3], (self.x, self.y))
+                self.walk_count += 1
+            else:
+                display.blit(self.walk_left[self.walk_count // 3], (self.x, self.y))
+                self.walk_count += 1
+
+            pygame.draw.rect(display, red, (self.hitbox[0], self.hitbox[1]-20, 45, 10))
+            pygame.draw.rect(display, green, (self.hitbox[0], self.hitbox[1]-20, 50 - ((4.75)*(10 - self.health)), 10))
+            self.hitbox = (self.x + 17, self.y + 2, 31, 57)
+            # pygame.draw.rect(display, red, self.hitbox, 2)
 
     def move(self):
         if self.velocity > 0:
@@ -91,6 +105,12 @@ class enemy(object):
             else:
                 self.velocity = self.velocity * -1
                 self.walk_count = 0
+    def hit(self):
+        if self.health > 0:
+            self.health -= 1
+        else:
+            self.visible = False
+        print('hit')
 
 black = (0, 0, 0)                   #defining Colours
 white = (255, 255, 255)
@@ -107,6 +127,8 @@ pygame.display.set_icon(programIcon)
 
 def UpdateDisplay():
     display.blit(background, (0, 0))     #creates a background
+    text = font.render("Score " + str(score), 1, black)
+    display.blit(text, (750, 10))
     character.draw(display)             #draw character
     Enemy.draw(display)
     for bullet in bullets:
@@ -114,8 +136,10 @@ def UpdateDisplay():
     pygame.display.update()                         #updating the display
 
 #mainloop
+font = pygame.font.SysFont("arial", 30, True, True)
 character = player(300, 310, 64, 64)            #character size and starter position
-Enemy = enemy(0, 350, 64, 64, 836)
+Enemy = enemy(0, 350, 64, 64, 836)         #enemy path, size and starter position
+fire_rate = 0
 bullets = []            
 run = True
 
@@ -123,11 +147,22 @@ while run:
     pygame.time.delay(27)                       #framerate
     clock.tick(27)
 
+    if fire_rate > 0:
+        fire_rate += 1
+    if fire_rate > 3:
+        fire_rate = 0
+
     for event in pygame.event.get():    #exit game
         if event.type == pygame.QUIT:
             run = False
 
     for bullet in bullets:
+        if bullet.y - bullet.radius < Enemy.hitbox[1] + Enemy.hitbox[3] and bullet.y + bullet.radius > Enemy.hitbox[1]:
+            if bullet.x + bullet.radius > Enemy.hitbox[0] and bullet.x - bullet.radius < Enemy.hitbox[0] + Enemy.hitbox[2]:
+                Enemy.hit()
+                score += 1
+                bullets.pop(bullets.index(bullet))
+
         if bullet.x < 900 and bullet.x > 0:
             bullet.x += bullet.velocity
         else:
@@ -135,13 +170,15 @@ while run:
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_w] or keys[pygame.K_UP]:           #buttons which fire a projectile
+    if keys[pygame.K_w] and fire_rate == 0 or keys[pygame.K_UP] and fire_rate == 0:           #buttons which fire a projectile
         if character.left:
             direction = -1
         else:
             direction = 1
         if len(bullets) < 10:           #number of projectiles/bullets there can be on the screen at the same time
             bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
+        fire_rate = 1
+
     if keys[pygame.K_LSHIFT]:        #sprint
         character.speed = 10
     else:
