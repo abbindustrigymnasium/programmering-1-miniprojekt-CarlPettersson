@@ -41,7 +41,7 @@ class player(object):
                 display.blit(char_walkLeft[0], (self.x, self.y))
 
 class projectile(object):
-    def __init__(self, x, y, radius, colour, direction):
+    def __init__(self, x, y, radius, colour, direction):            #the projectiles different attributes
         self.x = x
         self.y = y
         self.radius = radius
@@ -50,7 +50,7 @@ class projectile(object):
         self.velocity = 10 * direction
 
     def draw(self, display):
-        pygame.draw.circle(display, self.colour, (self.x, self.y), self.radius)
+        pygame.draw.circle(display, self.colour, (self.x, self.y), self.radius)         #drawing the projectile
 
 
 black = (0, 0, 0)                   #defining Colours
@@ -74,8 +74,8 @@ def UpdateDisplay():
     pygame.display.update()                         #updating the display
 
 #mainloop
-character = player(300, 350, 64, 64)
-bullets = []
+character = player(300, 350, 64, 64)            #character size and starter position
+bullets = []            
 run = True
 
 while run:
@@ -90,16 +90,16 @@ while run:
         if bullet.x < 900 and bullet.x > 0:
             bullet.x += bullet.velocity
         else:
-            bullets.pop(bullets.index(bullet))
+            bullets.pop(bullets.index(bullet))      #destroys bullets going outside the screen
 
     keys = pygame.key.get_pressed()
 
-    if keys[pygame.K_w] or keys[pygame.K_UP]:
+    if keys[pygame.K_w] or keys[pygame.K_UP]:           #buttons which fire a projectile
         if character.left:
             direction = -1
         else:
             direction = 1
-        if len(bullets) < 10:
+        if len(bullets) < 10:           #number of projectiles/bullets there can be on the screen at the same time
             bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
     if keys[pygame.K_LSHIFT] and keys[pygame.K_a] or keys[pygame.K_LSHIFT] and keys[pygame.K_d] or keys[pygame.K_LSHIFT] and keys[pygame.K_RIGHT] or keys[pygame.K_LSHIFT] and keys[pygame.K_LEFT]:        #sprint
         character.speed = 10
