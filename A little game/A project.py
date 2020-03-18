@@ -9,6 +9,12 @@ char_walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygam
 background = pygame.image.load('Mountains_background.png')       #background image
 char = pygame.image.load('standing.png')
 
+BulletSound = pygame.mixer.Sound('projectile.wav')
+HitSound = pygame.mixer.Sound('hit.wav')
+music = pygame.mixer.music.load('music.mp3')
+
+pygame.mixer.music.play(-1)
+
 score = 0
 
 class player(object):
@@ -149,7 +155,7 @@ while run:
 
     if fire_rate > 0:
         fire_rate += 1
-    if fire_rate > 3:
+    if fire_rate > 13:
         fire_rate = 0
 
     for event in pygame.event.get():    #exit game
@@ -162,6 +168,7 @@ while run:
                 Enemy.hit()
                 score += 1
                 bullets.pop(bullets.index(bullet))
+                HitSound.play()
 
         if bullet.x < 900 and bullet.x > 0:
             bullet.x += bullet.velocity
@@ -175,8 +182,9 @@ while run:
             direction = -1
         else:
             direction = 1
-        if len(bullets) < 10:           #number of projectiles/bullets there can be on the screen at the same time
+        if len(bullets) < 3:           #number of projectiles/bullets there can be on the screen at the same time
             bullets.append(projectile(round(character.x + character.width//2), round(character.y + character.height//2), 6, red, direction))    
+            BulletSound.play()
         fire_rate = 1
 
     if keys[pygame.K_LSHIFT]:        #sprint
