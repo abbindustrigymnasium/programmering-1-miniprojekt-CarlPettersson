@@ -61,6 +61,7 @@ class player(object):
         self.walk_count = 0
         self.jump = False
         self.jump_height = 10
+
         lose_font = pygame.font.SysFont('arial', 100)
         text = lose_font.render('You lost', 1, red)
         display.blit(text, (display_width/2 - (text.get_width()/2), display_height/2))
@@ -171,10 +172,11 @@ run = True
 while run:
     clock.tick(27)              #framerate
 
-    if character.hitbox[1] < Enemy.hitbox[1] + Enemy.hitbox[3] and character.hitbox[1] + character.hitbox[3] > Enemy.hitbox[1]:
-        if character.hitbox[0] + character.hitbox[2] > Enemy.hitbox[0] and character.hitbox[0] < Enemy.hitbox[0] + Enemy.hitbox[2]:
-            character.hit()
-            score = 0
+    if Enemy.visible == True:
+        if character.hitbox[1] < Enemy.hitbox[1] + Enemy.hitbox[3] and character.hitbox[1] + character.hitbox[3] > Enemy.hitbox[1]:
+            if character.hitbox[0] + character.hitbox[2] > Enemy.hitbox[0] and character.hitbox[0] < Enemy.hitbox[0] + Enemy.hitbox[2]:
+                character.hit()
+                score = 0
 
     if fire_rate > 0:
         fire_rate += 1
@@ -186,12 +188,13 @@ while run:
             run = False
 
     for bullet in bullets:
-        if bullet.y - bullet.radius < Enemy.hitbox[1] + Enemy.hitbox[3] and bullet.y + bullet.radius > Enemy.hitbox[1]:
-            if bullet.x + bullet.radius > Enemy.hitbox[0] and bullet.x - bullet.radius < Enemy.hitbox[0] + Enemy.hitbox[2]:
-                Enemy.hit()
-                score += 1
-                bullets.pop(bullets.index(bullet))
-                HitSound.play()
+        if Enemy.visible == True:
+            if bullet.y - bullet.radius < Enemy.hitbox[1] + Enemy.hitbox[3] and bullet.y + bullet.radius > Enemy.hitbox[1]:
+                if bullet.x + bullet.radius > Enemy.hitbox[0] and bullet.x - bullet.radius < Enemy.hitbox[0] + Enemy.hitbox[2]:
+                    Enemy.hit()
+                    score += 1
+                    bullets.pop(bullets.index(bullet))
+                    HitSound.play()
 
         if bullet.x < 900 and bullet.x > 0:
             bullet.x += bullet.velocity
