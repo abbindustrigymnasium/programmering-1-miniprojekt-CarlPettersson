@@ -60,6 +60,7 @@ class player(object):
         self.y = 350
         self.walk_count = 0
         self.jump = False
+        self.jump_height = 10
         lose_font = pygame.font.SysFont('arial', 100)
         text = lose_font.render('You lost', 1, red)
         display.blit(text, (display_width/2 - (text.get_width()/2), display_height/2))
