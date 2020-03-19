@@ -4,6 +4,10 @@ pygame.init()
 display_width = 900                 #display height
 display_height = 506                #display width
 
+display = pygame.display.set_mode((display_width, display_height))    #create screen
+pygame.display.set_caption("Mini project game")           #name screen
+clock = pygame.time.Clock()
+
 char_walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]     #character animation images
 char_walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
 background = pygame.image.load('Mountains_background.png')       #background image
@@ -11,8 +15,8 @@ char = pygame.image.load('standing.png')
 
 BulletSound = pygame.mixer.Sound('projectile.wav')
 HitSound = pygame.mixer.Sound('hit.wav')
-music = pygame.mixer.music.load('music.mp3')
 
+music = pygame.mixer.music.load('music.mp3')
 pygame.mixer.music.play(-1)
 
 score = 0
@@ -25,7 +29,7 @@ class player(object):
         self.height = height
         self.speed = 5
         self.jump = False
-        self.jump_height = 9
+        self.jump_height = 10
         self.left = False
         self.right = False
         self.walk_count = 0
@@ -50,6 +54,24 @@ class player(object):
                 display.blit(char_walkLeft[0], (self.x, self.y))
         self.hitbox = (self.x + 17, self.y + 11, 29, 52)
         # pygame.draw.rect(display, blue, self.hitbox, 2)
+
+    def hit(self):
+        self.x = 300
+        self.y = 350
+        self.walk_count = 0
+        self.jump = False
+        lose_font = pygame.font.SysFont('arial', 100)
+        text = lose_font.render('You lost', 1, red)
+        display.blit(text, (display_width/2 - (text.get_width()/2), display_height/2))
+        pygame.display.update()
+        i = 0
+        while i < 100:
+            pygame.time.delay(10)
+            i += 1
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    i = 301
+                    pygame.quit()
 
 class projectile(object):
     def __init__(self, x, y, radius, colour, direction):            #the projectiles different attributes
@@ -124,10 +146,6 @@ red = (255, 0, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 
-display = pygame.display.set_mode((display_width, display_height))    #create screen
-pygame.display.set_caption("Test")           #name screen
-clock = pygame.time.Clock()
-
 programIcon = pygame.image.load('icon.png')                 #set display Icon
 pygame.display.set_icon(programIcon)
 
@@ -143,15 +161,19 @@ def UpdateDisplay():
 
 #mainloop
 font = pygame.font.SysFont("arial", 30, True, True)
-character = player(300, 310, 64, 64)            #character size and starter position
+character = player(300, 350, 64, 64)            #character size and starter position
 Enemy = enemy(0, 350, 64, 64, 836)         #enemy path, size and starter position
 fire_rate = 0
 bullets = []            
 run = True
 
 while run:
-    pygame.time.delay(27)                       #framerate
-    clock.tick(27)
+    clock.tick(27)              #framerate
+
+    if character.hitbox[1] < Enemy.hitbox[1] + Enemy.hitbox[3] and character.hitbox[1] + character.hitbox[3] > Enemy.hitbox[1]:
+        if character.hitbox[0] + character.hitbox[2] > Enemy.hitbox[0] and character.hitbox[0] < Enemy.hitbox[0] + Enemy.hitbox[2]:
+            character.hit()
+            score = 0
 
     if fire_rate > 0:
         fire_rate += 1
@@ -204,11 +226,10 @@ while run:
     else:
         character.standing = True
         character.walk_count = 0
+
     if not (character.jump):
         if keys[pygame.K_SPACE]:
             character.jump = True               #Jumping
-            character.right = False
-            character.left = False
             character.walk_count = 0
     else:
         if character.jump_height >= -10:
