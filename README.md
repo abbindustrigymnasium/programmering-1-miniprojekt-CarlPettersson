@@ -10,5 +10,6 @@ Learning about:
     creating a small game, 
     for loop, 
     if statement, 
-    how to add sound and music
+    how to add sound and music, 
+    create hitboxes
   
