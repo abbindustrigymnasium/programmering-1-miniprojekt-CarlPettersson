@@ -161,12 +161,85 @@ def UpdateDisplay():
         bullet.draw(display)
     pygame.display.update()                         #updating the display
 
+def game_intro():
+
+    intro = True
+
+    while intro:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        mouse = pygame.mouse.get_pos()
+        click = pygame.mouse.get_pressed()
+        # print(click)
+
+        display.fill(white)
+        intro_font = pygame.font.SysFont('arial', 100)
+        text = intro_font.render('My inferior game', 1, black)
+        display.blit(text, (display_width/2 - (text.get_width()/2), display_height/2 - text.get_height()))          #shadow for the blue text
+
+        intro_font = pygame.font.SysFont('arial', 100)
+        text = intro_font.render('My inferior game', 1, (0, 0, 200))
+        display.blit(text, (display_width/2 - (text.get_width()/2) - 4, display_height/2 - text.get_height() - 4))  #blue text
+
+
+        if display_width/2 - 300 < mouse [0] and display_width/2 - 100 > mouse [0] and display_height/2 + 50 < mouse [1] and display_height/2 + 150 > mouse [1]:
+            pygame.draw.rect(display, green, (display_width/2 - 296, display_height/2 + 54, 200, 100))
+
+            green_button_text = pygame.font.SysFont('arial', 48)
+            text = green_button_text.render('Start game', 1, black)
+            display.blit(text, (display_width/2 - 291, display_height/2 + 74))
+            if click[0] == 1:
+                run = True
+                intro = False
+                   
+        else:
+            pygame.draw.rect(display, (0, 150, 0), (display_width/2 - 296, display_height/2 + 54, 200, 100))        #green button
+            pygame.draw.rect(display, (0, 150, 0), (display_width/2 - 297, display_height/2 + 53, 200, 100))
+            pygame.draw.rect(display, (0, 150, 0), (display_width/2 - 298, display_height/2 + 52, 200, 100))
+            pygame.draw.rect(display, (0, 150, 0), (display_width/2 - 299, display_height/2 + 51, 200, 100))
+            pygame.draw.rect(display, green, (display_width/2 - 300, display_height/2 + 50, 200, 100))
+
+            green_button_text = pygame.font.SysFont('arial', 48)
+            text = green_button_text.render('Start game', 1, black)
+            display.blit(text, (display_width/2 - 295, display_height/2 + 70))
+
+        if display_width/2 + 100 < mouse [0] and display_width/2 + 300 > mouse [0] and display_height/2 + 50 < mouse [1] and display_height/2 + 150 > mouse [1]:
+            pygame.draw.rect(display, red, (display_width/2 + 96, display_height/2 + 54, 200, 100))
+
+            red_button_text = pygame.font.SysFont('arial', 50)
+            text = red_button_text.render('Exit game', 1, black)
+            display.blit(text, (display_width/2 + 106, display_height/2 + 74))
+            if click[0] == 1:
+                pygame.quit()
+                quit()
+        else:
+            pygame.draw.rect(display, (150, 0, 0), (display_width/2 + 96, display_height/2 + 54, 200, 100))        # red button
+            pygame.draw.rect(display, (150, 0, 0), (display_width/2 + 97, display_height/2 + 53, 200, 100))
+            pygame.draw.rect(display, (150, 0, 0), (display_width/2 + 98, display_height/2 + 52, 200, 100))
+            pygame.draw.rect(display, (150, 0, 0), (display_width/2 + 99, display_height/2 + 51, 200, 100))
+            pygame.draw.rect(display, red, (display_width/2 + 100, display_height/2 + 50, 200, 100))
+
+            red_button_text = pygame.font.SysFont('arial', 50)
+            text = red_button_text.render('Exit game', 1, black)
+            display.blit(text, (display_width/2 + 110, display_height/2 + 70))
+
+        pygame.display.update()
+        clock.tick(15)
+
 #mainloop
 font = pygame.font.SysFont("arial", 30, True, True)
 character = player(300, 350, 64, 64)            #character size and starter position
 Enemy = enemy(0, 350, 64, 64, 836)         #enemy path, size and starter position
 fire_rate = 0
 bullets = []            
+intro = True
+
+if intro == True:
+    game_intro()
+
 run = True
 
 while run:
