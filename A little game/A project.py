@@ -140,7 +140,7 @@ class enemy(object):
             self.health -= 1
         else:
             self.visible = False
-        print('hit')
+        # print('hit')
 
 black = (0, 0, 0)                   #defining Colours
 white = (255, 255, 255)
@@ -250,6 +250,8 @@ while run:
             if character.hitbox[0] + character.hitbox[2] > Enemy.hitbox[0] and character.hitbox[0] < Enemy.hitbox[0] + Enemy.hitbox[2]:
                 character.hit()
                 score = 0
+                Enemy.health = 9
+                Enemy.x = 0
 
     if fire_rate > 0:
         fire_rate += 1
@@ -318,6 +320,9 @@ while run:
         else:
             character.jump = False
             character.jump_height = 10
+    
+    if keys[pygame.K_ESCAPE]:
+        game_intro()
     
     UpdateDisplay()
 
