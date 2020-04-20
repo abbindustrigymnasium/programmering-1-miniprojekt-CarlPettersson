@@ -1,5 +1,5 @@
 #vad jag har lärt mig
-jag har lärt mig använda pygame, lists, classes, while satser, if satser, objects, lägga till ljud effekter, musik, hur man kanskapa knappar, 
+jag har lärt mig använda pygame, lists, classes, while satser, if satser, objects, lägga till ljud effekter, sätta icons, musik, hur man kanskapa knappar, 
 skapa timers, skapa rörande bilder, skapa kontroller, lägga till bilder, konvertera python filer till exe och kanske något mer beroende på 
 om jag har missat något.
 
