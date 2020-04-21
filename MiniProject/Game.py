@@ -10,7 +10,9 @@ clock = pygame.time.Clock()
 
 char_walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png'), pygame.image.load('R4.png'), pygame.image.load('R5.png'), pygame.image.load('R6.png'), pygame.image.load('R7.png'), pygame.image.load('R8.png'), pygame.image.load('R9.png')]     #character animation images
 char_walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png'), pygame.image.load('L4.png'), pygame.image.load('L5.png'), pygame.image.load('L6.png'), pygame.image.load('L7.png'), pygame.image.load('L8.png'), pygame.image.load('L9.png')]
-background = pygame.image.load('Mountains_background.png')       #background image
+background1 = pygame.image.load('Backgound1.jpg')
+background2 = pygame.image.load('Mountains_background.png')
+background3 = pygame.image.load('Backgound2.png')       #background image
 char = pygame.image.load('standing.png')
 
 BulletSound = pygame.mixer.Sound('projectile.wav')
@@ -91,13 +93,14 @@ class enemy(object):
     walk_right = [pygame.image.load('R1E.png'), pygame.image.load('R2E.png'), pygame.image.load('R3E.png'), pygame.image.load('R4E.png'), pygame.image.load('R5E.png'), pygame.image.load('R6E.png'), pygame.image.load('R7E.png'), pygame.image.load('R8E.png'), pygame.image.load('R9E.png'), pygame.image.load('R10E.png'), pygame.image.load('R11E.png')]
     walk_left = [pygame.image.load('L1E.png'), pygame.image.load('L2E.png'), pygame.image.load('L3E.png'), pygame.image.load('L4E.png'), pygame.image.load('L5E.png'), pygame.image.load('L6E.png'), pygame.image.load('L7E.png'), pygame.image.load('L8E.png'), pygame.image.load('L9E.png'), pygame.image.load('L10E.png'), pygame.image.load('L11E.png')]
 
-    def __init__ (self, x, y, width, height, end):
+    def __init__ (self, x, y, width, height, end, start):
         self.x = x
         self.y = y
         self.width  = width
         self.height = height
         self.end = end
-        self.path = [self.x, self.end]
+        self.start = start
+        self.path = [self.start, self.end]
         self.walk_count = 0
         self.velocity = 3
         self.hitbox = self.hitbox = (self.x + 17, self.y + 2, 31, 57)
@@ -142,7 +145,10 @@ class enemy(object):
             # self.visible = False
             self.health = 9
             self.x = 0
-            self.velocity = 3 + score/5
+            if score < 50:
+                self.velocity = 3 + score/5
+            else:
+                self.velocity = 8 + score/(10-50)
         # print('hit')
 
 black = (0, 0, 0)                   #defining Colours
@@ -155,11 +161,18 @@ programIcon = pygame.image.load('icon.png')                 #set display Icon
 pygame.display.set_icon(programIcon)
 
 def UpdateDisplay():
-    display.blit(background, (0, 0))     #creates a background
+    if score >= 0:
+        display.blit(background1, (0, 0))
+        if score >= 20:
+            display.blit(background2, (0, 0))
+            if score >= 50:
+                display.blit(background3, (0, 0))     #creates a background
     text = font.render("Score " + str(score), 1, black)
     display.blit(text, (750, 10))
     character.draw(display)             #draw character
     Enemy.draw(display)
+    if score >= 50:
+        Enemy2.draw(display)
     for bullet in bullets:
         bullet.draw(display)
     pygame.display.update()                         #updating the display
@@ -303,7 +316,8 @@ def pause():
 #mainloop
 font = pygame.font.SysFont("arial", 30, True, True)
 character = player(600, 350, 64, 64)            #character size and starter position
-Enemy = enemy(0, 350, 64, 64, 836)         #enemy path, size and starter position
+Enemy = enemy(0, 350, 64, 64, 836, 0)         #enemy path, size and starter position
+Enemy2 = enemy(0, 350, 64, 64, 836, 0)
 fire_rate = 0
 bullets = []            
 intro = True
@@ -324,6 +338,15 @@ while run:
                 Enemy.health = 9
                 Enemy.x = 0
                 character.hit()
+    if score >= 50:
+        if Enemy2.visible == True:
+            if character.hitbox[1] < Enemy2.hitbox[1] + Enemy2.hitbox[3] and character.hitbox[1] + character.hitbox[3] > Enemy2.hitbox[1]:
+                if character.hitbox[0] + character.hitbox[2] > Enemy2.hitbox[0] and character.hitbox[0] < Enemy2.hitbox[0] + Enemy2.hitbox[2]:
+                    score = 0
+                    Enemy2.velocity = 3
+                    Enemy2.health = 9
+                    Enemy2.x = 0
+                    character.hit()
 
     if fire_rate > 0:
         fire_rate += 1
@@ -342,6 +365,14 @@ while run:
                     score += 1
                     bullets.pop(bullets.index(bullet))
                     HitSound.play()
+        if score >= 50:
+            if Enemy2.visible == True:
+                if bullet.y - bullet.radius < Enemy2.hitbox[1] + Enemy2.hitbox[3] and bullet.y + bullet.radius > Enemy2.hitbox[1]:
+                    if bullet.x + bullet.radius > Enemy2.hitbox[0] and bullet.x - bullet.radius < Enemy2.hitbox[0] + Enemy2.hitbox[2]:
+                        Enemy2.hit()
+                        score += 1
+                        bullets.pop(bullets.index(bullet))
+                        HitSound.play()
 
         if bullet.x < 900 and bullet.x > 0:
             bullet.x += bullet.velocity
@@ -360,7 +391,7 @@ while run:
             BulletSound.play()
         fire_rate = 1
 
-    if keys[pygame.K_LSHIFT]:        #sprint
+    if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:        #sprint
         character.speed = 10
     else:
         character.speed = 5
@@ -379,7 +410,7 @@ while run:
         character.walk_count = 0
 
     if not (character.jump):
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] or keys[pygame.K_RETURN]:
             character.jump = True               #Jumping
             character.walk_count = 0
     else:
