@@ -145,11 +145,10 @@ class enemy(object):
             # self.visible = False
             self.health = 9
             self.x = 0
-            if score < 50:
+            if score < 49:
                 self.velocity = 3 + score/5
             else:
-                self.velocity = 8 + score/(10-50)
-        # print('hit')
+                self.velocity = 5 + (score-50)/10
 
 black = (0, 0, 0)                   #defining Colours
 white = (255, 255, 255)
@@ -337,6 +336,9 @@ while run:
                 Enemy.velocity = 3
                 Enemy.health = 9
                 Enemy.x = 0
+                Enemy2.velocity = 3
+                Enemy2.health = 9
+                Enemy2.x = 0
                 character.hit()
     if score >= 50:
         if Enemy2.visible == True:
@@ -346,6 +348,9 @@ while run:
                     Enemy2.velocity = 3
                     Enemy2.health = 9
                     Enemy2.x = 0
+                    Enemy.velocity = 3
+                    Enemy.health = 9
+                    Enemy.x = 0
                     character.hit()
 
     if fire_rate > 0:
@@ -365,6 +370,7 @@ while run:
                     score += 1
                     bullets.pop(bullets.index(bullet))
                     HitSound.play()
+                    continue
         if score >= 50:
             if Enemy2.visible == True:
                 if bullet.y - bullet.radius < Enemy2.hitbox[1] + Enemy2.hitbox[3] and bullet.y + bullet.radius > Enemy2.hitbox[1]:
