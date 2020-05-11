@@ -4,3 +4,5 @@ skapa timers, skapa rörande bilder, skapa kontroller, lägga till bilder, konve
 om jag har missat något.
 
 för att kunna "spela" spelet måste du ha pygame senaste version installerat på datorn.
+
+kontroller: A=vänster D=höger W=projectile Space=jump Lshift=sprint esc=pause
